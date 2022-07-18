@@ -20,7 +20,6 @@ import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
-import org.apache.plc4x.java.modbus.ModbusDriver;
 import com.muellrc.industriandataextraction.model.Configuration;
 import com.muellrc.industriandataextraction.model.PlcFieldConfig;
 import org.slf4j.Logger;
