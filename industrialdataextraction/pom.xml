@@ -34,13 +34,18 @@
             <version>0.9.1</version>
         </dependency>
         
-        
         <dependency>
             <groupId>org.apache.plc4x</groupId>
             <artifactId>plc4j-driver-simulated</artifactId>
             <version>0.9.1</version>
           </dependency>
-
+          
+          <dependency>
+            <groupId>org.apache.plc4x</groupId>
+            <artifactId>plc4j-driver-modbus</artifactId>
+            <version>0.9.1</version>
+          </dependency>
+          
         <dependency>
             <groupId>com.hivemq</groupId>
             <artifactId>hivemq-mqtt-client</artifactId>
