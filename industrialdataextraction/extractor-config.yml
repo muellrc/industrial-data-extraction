@@ -1,16 +1,16 @@
 mqtt:
-  topic-name: plc4x/test-topic
+  topic-name: plc4x/modbus-test
   server-host: test.mosquitto.org
   server-port: 1883
 plc:
-  connection: simulated:plc4x-example-mqtt
+  connection: modbus:tcp://127.0.0.1:502
   addresses:
-    - name: intParam
-      address: RANDOM/foo:INTEGER
+    - name: 400002
+      address: 400002
       size: 1
       type: java.lang.Integer
-    - name: intParam2
-      address: RANDOM/bar:INTEGER
+    - name: 400003
+      address: 400003
       size: 1
       type: java.lang.Integer
 polling-interval: 2000
