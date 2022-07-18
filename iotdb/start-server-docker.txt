@@ -1,0 +1,1 @@
+docker run -d -p 6667:6667 -p 31999:31999 -p 8181:8181 --name iotdb-srv apache/iotdb:latest
