@@ -69,7 +69,7 @@ public class IndustrialdataextractionApplication {
 
         // Connect to the MQTT broker.
         final Single<Mqtt3ConnAck> connAckSingle = client.connect().timeout(10, TimeUnit.SECONDS);
-        System.out.println("Connected to MQTT Broker!");
+        System.out.println("Connected to MQTT Broker!" + client.toString());
 
         // Connect to the PLC.
         try (PlcConnection plcConnection = new PlcDriverManager().getConnection(config.getPlcConfig().getConnection())) {
