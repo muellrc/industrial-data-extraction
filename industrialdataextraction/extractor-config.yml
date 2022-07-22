@@ -1,6 +1,6 @@
 mqtt:
   topic-name: plc4x/modbus-test
-  server-host: localhost
+  server-host: hivemq
   server-port: 1883
 plc:
   connection: modbus:tcp://127.0.0.1:502
