@@ -1,0 +1,5 @@
+docker run \
+  --network=industrial-data-extraction-network \
+  -v $PWD/influxdb-data:/var/lib/influxdb \
+  --name influxdb \
+  influxdb
