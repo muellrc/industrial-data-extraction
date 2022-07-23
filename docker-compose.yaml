@@ -1,61 +1,69 @@
 version: "3.9"
 services:
-  dev-grafana:
-      image: grafana/grafana
-      restart: always
-      ports:
-        - "8080:3000"
-      depends_on:
-        - influxdb
-      volumes:
-        - grafana-storage:/var/lib/grafana
-      build:
-        context: ./grafana
+  # dev-grafana:
+  #     image: grafana/grafana
+  #     restart: always
+  #     ports:
+  #       - "8080:3000"
+  #     depends_on:
+  #       - influxdb
+  #     volumes:
+  #       - grafana-storage:/var/lib/grafana
+  #     build:
+  #       context: ./grafana
   
-  influxdb:
-    image: influxdb
-    restart: always
-    ports:
-      - "8086:8086"
-    networks:
-      - industrial-data-extraction-network
-    volumes:
-      - influxdb-storage:/var/lib/influxdb
-  
-  telegraf:
-    image: telegraf
-    restart: always
-    volumes:
-      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    depends_on:
-      - hivemq
-      - influxdb
-    networks:
-      - industrial-data-extraction-network
-  
-  hivemq:
-    image: hivemq/hivemq-ce
-    restart: always
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    networks:
-      - industrial-data-extraction-network
+  # influxdb:
+  #   image: influxdb
+  #   restart: always
+  #   ports:
+  #     - "8086:8086"
+  #   environment:
+  #     - INFLUXDB_DB=db0
+  #     - INFLUXDB_ADMIN_USER=admin
+  #     - INFLUXDB_ADMIN_PASSWORD=admin
     
-  data-extractor:
-    image: maven
-    restart: always
-    volumes:
-      - extractor-storage:/var/lib/extractor
-    depends_on:
-      - hivemq
-      - modbus-server
-    networks:
-      - industrial-data-extraction-network
+  #   networks:
+  #     - industrial-data-extraction-network
+  #   volumes:
+  #     - influxdb-storage:/var/lib/influxdb
+  
+  # telegraf:
+  #   image: telegraf
+  #   container_name: telegraf
+  #   restart: always
+  #   volumes:
+  #    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+  #   depends_on:
+  #     - influxdb
+  #   links:
+  #     - influxdb
+  #   ports:
+  #   - '8125:8125'
+  #   networks:
+  #     - industrial-data-extraction-network
+  
+  # hivemq:
+  #   image: hivemq/hivemq-ce
+  #   restart: always
+  #   ports:
+  #     - "1883:1883"
+  #     - "9001:9001"
+  #   networks:
+  #     - industrial-data-extraction-network
+    
+#   data-extractor:
+#     image: maven
+#     restart: always
+#     volumes:
+#       - extractor-storage:/var/lib/extractor
+#    depends_on:
+#      - hivemq
+#      - modbus-server
+#     networks:
+#       - industrial-data-extraction-network
 
   modbus-client:
     image: python
-    restart: always
     depends_on:
       - modbus-server
     networks:
@@ -63,14 +71,13 @@ services:
 
   modbus-server:
     image: python
-    restart: always
     networks:
       - industrial-data-extraction-network
 
 networks:
   industrial-data-extraction-network:
 
-volumes:
-  influxdb-storage:
-  grafana-storage:
-  extractor-storage:
+# volumes:
+ # influxdb-storage:
+ # grafana-storage:
+ # extractor-storage:
