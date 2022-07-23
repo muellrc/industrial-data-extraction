@@ -23,7 +23,7 @@ def main():
     try:
 
         def on_before_connect(args):
-            master = args[0]
+            master =  args[0]
             logger.debug("on_before_connect {0} {1}".format(master._host, master._port))
 
         hooks.install_hook("modbus_tcp.TcpMaster.before_connect", on_before_connect)
@@ -35,7 +35,8 @@ def main():
         hooks.install_hook("modbus_tcp.TcpMaster.after_recv", on_after_recv)
 
         # Connect to the Server
-        master = modbus_tcp.TcpMaster()
+        #master = modbus_tcp.TcpMaster()
+        master = modbus_tcp.TcpMaster(host="modbus-server")
         master.set_timeout(5.0)
         logger.info("connected")
 

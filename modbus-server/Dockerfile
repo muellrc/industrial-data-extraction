@@ -1,5 +1,5 @@
-FROM python
+FROM prefecthq/prefect:latest-python3.9
+RUN mkdir etl
+COPY . modbus/
 RUN pip install modbus_tk
-RUN mkdir app
-COPY . app
-CMD PYTHONPATH='./app' modbus-server.py
+CMD python modbus/modbus-server.py

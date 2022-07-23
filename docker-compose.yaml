@@ -62,22 +62,30 @@ services:
 #     networks:
 #       - industrial-data-extraction-network
 
-  modbus-client:
-    image: python
-    depends_on:
-      - modbus-server
+    # App Service
+
+  modbus-server:
+    build: modbus-server
+    ports:
+      - 8082:8082
+    restart: on-failure
     networks:
       - industrial-data-extraction-network
 
-  modbus-server:
-    image: python
+  modbus-client:
+    build: modbus-client
+    ports:
+      - 8081:8081
+    restart: on-failure
+    depends_on:
+      - modbus-server
     networks:
       - industrial-data-extraction-network
 
 networks:
   industrial-data-extraction-network:
 
-# volumes:
- # influxdb-storage:
- # grafana-storage:
- # extractor-storage:
+volumes:
+ influxdb-storage:
+ grafana-storage:
+ extractor-storage:

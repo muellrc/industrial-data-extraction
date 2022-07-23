@@ -78,24 +78,24 @@ class MySimulator(Simulator):
 
 def main():
     """main"""
-    while True:
-        #Connect to the slave
-        if 'rtu' in sys.argv:
-            server = RtuServer(serial.Serial(port=sys.argv[-1]))
-        else:
-            server = TcpServer(error_on_missing_slave=True)
+    
+    #Connect to the slave
+    if 'rtu' in sys.argv:
+        server = RtuServer(serial.Serial(port=sys.argv[-1]))
+    else:
+        server = TcpServer(error_on_missing_slave=True)
 
-        simu = MySimulator(server)
+    simu = MySimulator(server)
 
-        try:
-            LOGGER.info("'quit' for closing the server")
-            simu.start()
+    try:
+        LOGGER.info("'quit' for closing the server")
+        simu.start()
 
-        except Exception as excpt:
-            print(excpt)
+    except Exception as excpt:
+        print(excpt)
 
-        finally:
-            simu.close()
+    finally:
+        simu.close()
 
 
 if __name__ == "__main__":
