@@ -6,8 +6,6 @@ services:
         restart: always
         ports:
           - "8080:3000"
-        depends_on:
-          - influxdb
         volumes:
           - grafana-storage:/var/lib/grafana
         build:
