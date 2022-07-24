@@ -3,7 +3,7 @@ mqtt:
   server-host: hivemq
   server-port: 1883
 plc:
-  connection: modbus:tcp://127.0.0.1:502
+  connection: modbus:tcp://modbus-server:502
   addresses:
     - name: 400002
       address: 400002

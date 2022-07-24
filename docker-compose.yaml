@@ -1,6 +1,7 @@
 version: "3.9"
 services:
-  # dev-grafana:
+
+# dev-grafana:
   #     image: grafana/grafana
   #     restart: always
   #     ports:
@@ -41,46 +42,44 @@ services:
   #   - '8125:8125'
   #   networks:
   #     - industrial-data-extraction-network
-  
-  # hivemq:
-  #   image: hivemq/hivemq-ce
-  #   restart: always
-  #   ports:
-  #     - "1883:1883"
-  #     - "9001:9001"
-  #   networks:
-  #     - industrial-data-extraction-network
-    
-#   data-extractor:
-#     image: maven
-#     restart: always
-#     volumes:
-#       - extractor-storage:/var/lib/extractor
-#    depends_on:
-#      - hivemq
-#      - modbus-server
-#     networks:
-#       - industrial-data-extraction-network
 
-    # App Service
-
-  modbus-server:
-    build: modbus-server
+  hivemq:
+    image: hivemq/hivemq-ce
+    restart: always
     ports:
-      - 8082:8082
-    restart: on-failure
+      - "1883:1883"
     networks:
       - industrial-data-extraction-network
 
+  data-extractor:
+    build: industrialdataextraction
+    platform: linux/amd64
+    ports:
+      - "8080:1883"
+    depends_on:
+      - hivemq
+      - modbus-server
+    networks:
+      - industrial-data-extraction-network
+           
+  modbus-server:
+    build: modbus-server
+    ports:
+      - 502:502
+    restart: on-failure
+    networks:
+      - industrial-data-extraction-network
+    volumes:
+      - extractor-storage:/var/lib/extractor
+
   modbus-client:
     build: modbus-client
-    ports:
-      - 8081:8081
     restart: on-failure
     depends_on:
       - modbus-server
     networks:
-      - industrial-data-extraction-network
+      - industrial-data-extraction-network  
+
 
 networks:
   industrial-data-extraction-network:
