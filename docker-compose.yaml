@@ -1,48 +1,18 @@
 version: "3.9"
 services:
 
-# dev-grafana:
-  #     image: grafana/grafana
-  #     restart: always
-  #     ports:
-  #       - "8080:3000"
-  #     depends_on:
-  #       - influxdb
-  #     volumes:
-  #       - grafana-storage:/var/lib/grafana
-  #     build:
-  #       context: ./grafana
-  
-  # influxdb:
-  #   image: influxdb
-  #   restart: always
-  #   ports:
-  #     - "8086:8086"
-  #   environment:
-  #     - INFLUXDB_DB=db0
-  #     - INFLUXDB_ADMIN_USER=admin
-  #     - INFLUXDB_ADMIN_PASSWORD=admin
+  dev-grafana:
+        image: grafana/grafana
+        restart: always
+        ports:
+          - "8080:3000"
+        depends_on:
+          - influxdb
+        volumes:
+          - grafana-storage:/var/lib/grafana
+        build:
+          context: ./grafana
     
-  #   networks:
-  #     - industrial-data-extraction-network
-  #   volumes:
-  #     - influxdb-storage:/var/lib/influxdb
-  
-  # telegraf:
-  #   image: telegraf
-  #   container_name: telegraf
-  #   restart: always
-  #   volumes:
-  #    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
-  #   depends_on:
-  #     - influxdb
-  #   links:
-  #     - influxdb
-  #   ports:
-  #   - '8125:8125'
-  #   networks:
-  #     - industrial-data-extraction-network
-
   hivemq:
     image: hivemq/hivemq-ce
     restart: always
@@ -54,8 +24,9 @@ services:
   data-extractor:
     build: industrialdataextraction
     platform: linux/amd64
+    restart: always
     ports:
-      - "8080:1883"
+      - "8081:1883"
     depends_on:
       - hivemq
       - modbus-server
@@ -88,3 +59,39 @@ volumes:
  influxdb-storage:
  grafana-storage:
  extractor-storage:
+
+
+
+  # ========================OLD========================
+  # influxdb:
+  #   image: influxdb
+  #   restart: always
+  #   ports:
+  #     - "8086:8086"
+  #   environment:
+  #     - INFLUXDB_DB=telegraf
+  #     - INFLUXDB_USER=telegraf
+  #     - INFLUXDB_ADMIN_ENABLED=true
+  #     - INFLUXDB_ADMIN_USER=admin
+  #     - INFLUXDB_ADMIN_PASSWORD=Welcome1 
+  #   networks:
+  #       - industrial-data-extraction-network
+  #   volumes:
+  #       - influxdb-storage:/var/lib/influxdb
+
+  # telegraf:
+  #   image: telegraf
+  #   container_name: telegraf
+  #   restart: always
+  #   volumes:
+  #    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+  #   depends_on:
+  #     - influxdb
+  #   links:
+  #     - influxdb
+  #   ports:
+  #   - '8125:8125'
+  #   networks:
+  #     - industrial-data-extraction-network
+  #   environment:                            
+  #     INFLUXDB_URL: http://influxdb:8086 
