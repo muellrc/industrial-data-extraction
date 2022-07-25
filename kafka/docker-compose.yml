@@ -1,20 +1,8 @@
-version: "3.9"
+---
+version: '3'
+# Example based on https://github.com/saubury/stream-smarts
+
 services:
-
-  # dev-grafana:
-  #   image: grafana/grafana
-  #   restart: always
-  #   ports:
-  #     - "8080:3000"
-  #   volumes:
-  #     - grafana-storage:/var/lib/grafana
-  #   build:
-  #     context: ./grafana
-  #   networks:
-  #     - industrial-data-extraction-network
-
-# =============== START OF KAFKA INFRASTRUCTURE ================
-
   zookeeper:
     image: "confluentinc/cp-zookeeper:${CONF_VER}"
     container_name: zookeeper
@@ -53,7 +41,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
       CONFLUENT_METRICS_ENABLE: 'false'
     volumes:
-      - kafka/scripts:/data/scripts/
+      - ./scripts:/data/scripts/
 
   schema-registry:
     image: "confluentinc/cp-schema-registry:${CONF_VER}"
@@ -64,13 +52,15 @@ services:
       - zookeeper
       - kafka
     volumes:
-      - kafka/scripts:/scripts    
+      - ./scripts:/scripts    
     environment:
       TZ: ${TZ_SET}
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
       SCHEMA_REGISTRY_AVRO_COMPATIBILITY_LEVEL: "none"
       SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: "WARN"
+
+  
 
   ksql-server:
     image: confluentinc/cp-ksql-server:${CONF_VER}
@@ -89,7 +79,7 @@ services:
       KSQL_KSQL_EXTENSION_DIR: "/etc/ksql/ext"
       KSQL_AUTO_OFFSET_RESET: "earliest"
     volumes:
-      - kafka/scripts:/scripts
+      - ./scripts:/scripts
       - ./ext:/etc/ksql/ext
 
   ksql-cli:
@@ -100,7 +90,7 @@ services:
     entrypoint: /bin/sh
     tty: true
     volumes:
-      - kafka/scripts:/data/scripts/
+      - ./scripts:/data/scripts/
 
   kafka-connect:
     container_name: kafka-connect
@@ -155,6 +145,8 @@ services:
     volumes:
       - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml
     hostname: kibana
+    environment:
+      TZ: ${TZ_SET}
     ports:
       - "5601:5601"
     depends_on:
@@ -162,7 +154,6 @@ services:
     environment:
       xpack.security.enabled: "false"
       discovery.type: "single-node"
-      TZ: ${TZ_SET}
 
 
   # postgres:
@@ -180,52 +171,3 @@ services:
   # #    - ./pgdata/:/var/lib/postgresql/data/pgdata
   #  extra_hosts:
   #    - "moby:127.0.0.1"
-
-# ===============  END OF KAFKA INFRASTRUCTURE ================
-
-  hivemq:
-    image: hivemq/hivemq-ce
-    restart: always
-    ports:
-      - "1883:1883"
-    networks:
-      - industrial-data-extraction-network
-
-  data-extractor:
-    build: industrialdataextraction
-    platform: linux/amd64
-    restart: always
-    ports:
-      - "8081:1883"
-    depends_on:
-      - hivemq
-      - modbus-server
-    networks:
-      - industrial-data-extraction-network
-           
-  modbus-server:
-    build: modbus-server
-    ports:
-      - 502:502
-    restart: on-failure
-    networks:
-      - industrial-data-extraction-network
-    volumes:
-      - extractor-storage:/var/lib/extractor
-
-  modbus-client:
-    build: modbus-client
-    restart: on-failure
-    depends_on:
-      - modbus-server
-    networks:
-      - industrial-data-extraction-network  
-
-networks:
-  industrial-data-extraction-network:
-
-volumes:
- influxdb-storage:
- grafana-storage:
- extractor-storage:
- mongo-storage: 

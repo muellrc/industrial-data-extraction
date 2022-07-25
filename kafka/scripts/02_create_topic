@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TOPIC=data_demo
+ZOOKEEPER=zookeeper:2181
+BROKER=kafka:9092
+
+docker exec kafka kafka-topics --if-not-exists --zookeeper ${ZOOKEEPER} --create --partitions 1 --replication-factor 1 --topic ${TOPIC}
+
+docker exec kafka bash -c "head -1 ${FILE} | kafka-console-producer --broker-list ${BROKER} --topic ${TOPIC}"
