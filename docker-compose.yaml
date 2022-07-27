@@ -13,17 +13,28 @@ services:
     networks:
       - industrial-data-extraction-network
 
-  # influxdb:
-  #   container_name: influxdb
-  #   image: influxdb:1.8
-  #   ports:
-  #     - "8086:8086"
-  #   volumes:
-  #     - ./influxdb:/var/lib/influxdb
-  #     - ./influxdb:/etc/influxdb/
-  #   restart: always
-  #   networks:
-  #     - industrial-data-extraction-network
+  influxdb:
+    container_name: influxdb
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb:/var/lib/influxdb
+      - ./influxdb:/etc/influxdb/
+    restart: always
+    networks:
+      - industrial-data-extraction-network
+    
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - industrial-data-extraction-network
 
   telegraf:
     container_name: telegraf
