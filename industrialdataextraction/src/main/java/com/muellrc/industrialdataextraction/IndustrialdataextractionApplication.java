@@ -58,7 +58,7 @@ public class IndustrialdataextractionApplication {
         }
     }
 
-    private void run() throws PlcException {
+    private void run() throws PlcException, InterruptedException {
         // Create a new MQTT client.
         final Mqtt3RxClient client = MqttClient.builder()
             .identifier(UUID.randomUUID().toString())
@@ -70,51 +70,54 @@ public class IndustrialdataextractionApplication {
         // Connect to the MQTT broker.
         final Single<Mqtt3ConnAck> connAckSingle = client.connect().timeout(10, TimeUnit.SECONDS);
         System.out.println("Connected to MQTT Broker!");
+        
+        while(true) {
+            Thread.sleep(2000);
+            // Connect to the PLC.
+            try (PlcConnection plcConnection = new PlcDriverManager().getConnection(config.getPlcConfig().getConnection())) {
 
-        // Connect to the PLC.
-        try (PlcConnection plcConnection = new PlcDriverManager().getConnection(config.getPlcConfig().getConnection())) {
+                // Check if this connection support reading of data.
+                if (!plcConnection.getMetadata().canRead()) {
+                    System.err.println("This connection doesn't support reading.");
+                    return;
+                }
 
-            // Check if this connection support reading of data.
-            if (!plcConnection.getMetadata().canRead()) {
-                System.err.println("This connection doesn't support reading.");
-                return;
+                // Create a new read request.
+                PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
+                for (PlcFieldConfig fieldConfig : config.getPlcConfig().getPlcFields()) {
+                    builder = builder.addItem(fieldConfig.getName(), fieldConfig.getAddress());
+                }
+                PlcReadRequest readRequest = builder.build();
+
+                // Send a message containing the PLC read response.
+                Flowable<Mqtt3Publish> messagesToPublish = Flowable.generate(emitter -> {
+                    PlcReadResponse response = readRequest.execute().get();
+                    String jsonPayload = getPayload(response);
+                    final Mqtt3Publish publishMessage = Mqtt3Publish.builder()
+                        .topic(config.getMqttConfig().getTopicName())
+                        .qos(MqttQos.AT_LEAST_ONCE)
+                        .payload(jsonPayload.getBytes())
+                        .build();
+                    emitter.onNext(publishMessage);
+                });
+
+                // Emit 1 message only every 100 milliseconds.
+                messagesToPublish = messagesToPublish.zipWith(Flowable.interval(
+                    config.getPollingInterval(), TimeUnit.MILLISECONDS), (publish, aLong) -> publish);
+
+                final Single<Mqtt3ConnAck> connectScenario = connAckSingle
+                    .doOnSuccess(connAck -> System.out.println("Connected with return code " + connAck.getReturnCode()))
+                    .doOnError(throwable -> System.out.println("Connection failed, " + throwable.getMessage()));
+
+                final Flowable<Mqtt3PublishResult> publishScenario = client.publish(messagesToPublish)
+                    .doOnNext(publishResult -> System.out.println(
+                        "Publish acknowledged: " + new String(publishResult.getPublish().getPayloadAsBytes())));
+
+                connectScenario.toCompletable().andThen(publishScenario).blockingSubscribe();
+            } 
+            catch (Exception e) {
+                throw new PlcException("Error creating connection to " + config.getPlcConfig().getConnection(), e);
             }
-
-            // Create a new read request.
-            PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
-            for (PlcFieldConfig fieldConfig : config.getPlcConfig().getPlcFields()) {
-                builder = builder.addItem(fieldConfig.getName(), fieldConfig.getAddress());
-            }
-            PlcReadRequest readRequest = builder.build();
-
-            // Send a message containing the PLC read response.
-            Flowable<Mqtt3Publish> messagesToPublish = Flowable.generate(emitter -> {
-                PlcReadResponse response = readRequest.execute().get();
-                String jsonPayload = getPayload(response);
-                final Mqtt3Publish publishMessage = Mqtt3Publish.builder()
-                    .topic(config.getMqttConfig().getTopicName())
-                    .qos(MqttQos.AT_LEAST_ONCE)
-                    .payload(jsonPayload.getBytes())
-                    .build();
-                emitter.onNext(publishMessage);
-            });
-
-            // Emit 1 message only every 100 milliseconds.
-            messagesToPublish = messagesToPublish.zipWith(Flowable.interval(
-                config.getPollingInterval(), TimeUnit.MILLISECONDS), (publish, aLong) -> publish);
-
-            final Single<Mqtt3ConnAck> connectScenario = connAckSingle
-                .doOnSuccess(connAck -> System.out.println("Connected with return code " + connAck.getReturnCode()))
-                .doOnError(throwable -> System.out.println("Connection failed, " + throwable.getMessage()));
-
-            final Flowable<Mqtt3PublishResult> publishScenario = client.publish(messagesToPublish)
-                .doOnNext(publishResult -> System.out.println(
-                    "Publish acknowledged: " + new String(publishResult.getPublish().getPayloadAsBytes())));
-
-            connectScenario.toCompletable().andThen(publishScenario).blockingSubscribe();
-        } 
-        catch (Exception e) {
-            throw new PlcException("Error creating connection to " + config.getPlcConfig().getConnection(), e);
         }
     }
 
@@ -133,7 +136,7 @@ public class IndustrialdataextractionApplication {
         return jsonObject.toString();
     }
     
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		SpringApplication.run(IndustrialdataextractionApplication.class, args);
 
                 IndustrialdataextractionApplication industrialdataextractor = new IndustrialdataextractionApplication("extractor-config.yml");

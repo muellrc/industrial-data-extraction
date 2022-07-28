@@ -3,7 +3,7 @@ datasources:
   - name: InfluxDB
     type: influxdb
     access: proxy
-    database: db0
+    database: plc4x_values
     user: admin
     password: admin
     url: http://influxdb:8086

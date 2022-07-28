@@ -10,6 +10,8 @@ import modbus_tk
 import modbus_tk.defines as cst
 from modbus_tk import modbus_tcp, hooks
 import logging
+import time
+from random import randrange
 
 def main():
     """main"""
@@ -40,11 +42,13 @@ def main():
         master.set_timeout(5.0)
         logger.info("connected")
 
-        # Writes to 400002 and 400003
-        logger.info(master.execute(1, cst.WRITE_SINGLE_REGISTER, 1, output_value=100))
-        logger.info(master.execute(1, cst.WRITE_SINGLE_REGISTER, 2, output_value=200))
-        #Outputs values in 400002 and 400003
-        logger.info(master.execute(1, cst.READ_HOLDING_REGISTERS, 1, 2))
+        while(True):
+            time.sleep(2)
+            # Writes to 400002 and 400003
+            logger.info(master.execute(1, cst.WRITE_SINGLE_REGISTER, 1, output_value=int(randrange(100))))
+            logger.info(master.execute(1, cst.WRITE_SINGLE_REGISTER, 2, output_value=int(randrange(200))))
+            #Outputs values in 400002 and 400003
+            logger.info(master.execute(1, cst.READ_HOLDING_REGISTERS, 1, 2))
 
 
     except modbus_tk.modbus.ModbusError as exc:
