@@ -80,5 +80,3 @@ volumes:
  influxdb-storage:
  grafana-storage:
  extractor-storage:
- mongo-storage:
- prometheus-data:
