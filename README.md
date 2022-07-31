@@ -1,10 +1,18 @@
 # industrial-data-extraction
 
+![Dashboard Screenshot](https://user-images.githubusercontent.com/89973885/182029682-468be1ba-67ae-4b0a-934f-bf1383caec22.png)
+
+
 ## Introduction
 
-<img alt="image" src="https://user-images.githubusercontent.com/89973885/166163284-a914ac1c-56a7-462b-a25a-d61c3d54e6dc.png">
+Thi project shows the complete path from industrial device to a Business Intelligence dashboard using open source software, by simulating Modbus Server and Client devices in Python (via modbus_tk), querying data from the Modbus Server in Modbus TCP (via Apache PLC4X Library for Java), publishing the modbus register values via MQTT to HiveMQ, and storing the timeseries data in InfluxDB via the Telegraf server agent. The data stored in InfluxDB is then shown in a dashboard built in Grafana. 
+The project is configurable and could also support other protocols via configuration, such as Siemens S7 and OPC-UA.
 
-A Docker network is used to ensure security.<br />
+## Architecture:
+
+
+![industrial-data-extraction](https://user-images.githubusercontent.com/89973885/182029628-03f489c8-55f2-4e08-9298-ebd01eeb97ad.png)
+
 
 ## How to Run
 
@@ -17,10 +25,10 @@ To run this project, simply call docker-compose:<br />
 ```
 MQTT Connection Starting...
 Connected to MQTT Broker!
-INFO 1 --- [           main] org.apache.plc4x.java.PlcDriverManager   : Instantiating new PLC Driver Manager with class loader org.springframework.boot.loader.LaunchedURLClassLoader@5e9f23b4
-INFO 1 --- [           main] org.apache.plc4x.java.PlcDriverManager   : Registering available drivers...
-INFO 1 --- [           main] org.apache.plc4x.java.PlcDriverManager   : Registering driver for Protocol modbus (Modbus)
-INFO 1 --- [           main] o.a.p.j.transport.tcp.TcpChannelFactory  : Configuring Bootstrap with Configuration{}
+INFO 1 --- [main] org.apache.plc4x.java.PlcDriverManager   : Instantiating new PLC Driver Manager with class loader org.springframework.boot.loader.LaunchedURLClassLoader@5e9f23b4
+INFO 1 --- [main] org.apache.plc4x.java.PlcDriverManager   : Registering available drivers...
+INFO 1 --- [main] org.apache.plc4x.java.PlcDriverManager   : Registering driver for Protocol modbus (Modbus)
+INFO 1 --- [main] o.a.p.j.transport.tcp.TcpChannelFactory  : Configuring Bootstrap with Configuration{}
 Connected with return code SUCCESS
 {"400002":"84","400003":"3"}
 Publish acknowledged: {"400002":"84","400003":"3"}
