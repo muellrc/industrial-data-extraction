@@ -3,7 +3,7 @@
 ## Introduction
 
 Thi project shows the complete path from industrial device to a Business Intelligence dashboard using open source software, by simulating Modbus Server and Client devices in Python (via modbus_tk), querying data from the Modbus Server in Modbus TCP (via Apache PLC4X Library for Java), publishing the modbus register values via MQTT to HiveMQ, and storing the timeseries data in InfluxDB via the Telegraf server agent. The data stored in InfluxDB is then shown in a dashboard built in Grafana. 
-The project is configurable and could also support other protocols via configuration, such as Siemens S7 and OPC-UA.
+The project is configurable and could also support other protocols via configuration, such as Siemens S7, DeltaV and OPC-UA.
 
 ![Dashboard Screenshot](https://user-images.githubusercontent.com/89973885/182029682-468be1ba-67ae-4b0a-934f-bf1383caec22.png)
 
